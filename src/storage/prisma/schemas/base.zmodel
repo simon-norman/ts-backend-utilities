@@ -1,0 +1,10 @@
+abstract model Base {
+    id String @id @default(uuid())
+    createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt() @db.Timestamptz(6)
+
+    deleted Boolean @default(false)
+    deleted_at DateTime? @db.Timestamptz(6)
+
+    @@deny('read', deleted)
+}

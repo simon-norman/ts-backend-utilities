@@ -8,4 +8,8 @@ export default defineConfig({
 	clean: true,
 	dts: true,
 	treeshake: true,
+	onSuccess: `
+    mkdir -p ./dist/resources/storage/prisma/schemas
+    cp -r ./src/storage/prisma/schemas ./dist/resources/storage/prisma/schemas
+    `,
 });

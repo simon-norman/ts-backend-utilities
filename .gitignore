@@ -65,3 +65,5 @@ out
 **/._.DS_Store
 .DS_Store
 */.DS_Store
+
+/dist
