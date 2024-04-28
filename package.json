@@ -1,28 +1,28 @@
 {
-  "name": "@breeze32/ts-backend-utilities",
-  "version": "1.0.1",
-  "author": "Simon Norman",
-  "main": "dist/index.js",
-  "devDependencies": {
-    "@biomejs/biome": "^1.5.3",
-    "@types/bun": "^1.1.0",
-    "prisma": "^5.13.0",
-    "ts-node": "^10.9.2",
-    "tsup": "^8.0.1",
-    "type-fest": "^4.15.0",
-    "typescript": "^5.3.3",
-    "zenstack": "^2.0.1"
-  },
-  "peerDependencies": {
-    "@prisma/client": "*",
-    "@zenstackhq/runtime": "*"
-  },
-  "license": "MIT",
-  "scripts": {
-    "prepublish": "tsup",
-    "build": "tsup",
-    "bump-patch": "pnpm version patch",
-    "publish-patch": "pnpm bump-patch && pnpm publish"
-  },
-  "types": "dist/index.d.ts"
+	"name": "@breeze32/ts-backend-utilities",
+	"version": "1.0.1",
+	"author": "Simon Norman",
+	"main": "dist/index.js",
+	"devDependencies": {
+		"@biomejs/biome": "^1.5.3",
+		"@types/bun": "^1.1.0",
+		"prisma": "^5.13.0",
+		"ts-node": "^10.9.2",
+		"tsup": "^8.0.1",
+		"type-fest": "^4.15.0",
+		"typescript": "^5.3.3",
+		"zenstack": "^2.0.1"
+	},
+	"peerDependencies": {
+		"@prisma/client": "*",
+		"@zenstackhq/runtime": "*"
+	},
+	"license": "MIT",
+	"scripts": {
+		"prepublish": "tsup",
+		"build": "tsup",
+		"bump-patch": "pnpm version patch",
+		"publish-patch": "pnpm bump-patch && pnpm publish --access public"
+	},
+	"types": "dist/index.d.ts"
 }
