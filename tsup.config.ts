@@ -10,6 +10,6 @@ export default defineConfig({
 	treeshake: true,
 	onSuccess: `
     mkdir -p ./dist/resources/storage/prisma/schemas
-    cp -r ./src/storage/prisma/schemas ./dist/resources/storage/prisma/schemas
+    cp -r ./src/storage/prisma/schemas ./dist/resources/storage/prisma
     `,
 });
