@@ -22,7 +22,13 @@
 		"prepublish": "tsup",
 		"build": "tsup",
 		"bump-patch": "pnpm version patch",
-		"publish-patch": "pnpm bump-patch && pnpm publish --access public"
+		"publish-patch": "pnpm bump-patch && pnpm publish --access public",
+		"bump-minor": "pnpm version minor",
+		"publish-minor": "pnpm bump-minor && pnpm publish --access public"
 	},
-	"types": "dist/index.d.ts"
+	"types": "dist/index.d.ts",
+	"dependencies": {
+		"@aws-sdk/client-secrets-manager": "^3.583.0",
+		"@sinclair/typebox": "^0.32.31"
+	}
 }
