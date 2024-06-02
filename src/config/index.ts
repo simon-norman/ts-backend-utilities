@@ -6,7 +6,7 @@ import {
 import { type Static, Type as T, type TObject } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 
-enum DeploymentType {
+export enum DeploymentType {
 	fargate = "fargate",
 	lambda = "lambda",
 }
@@ -29,7 +29,7 @@ export class Config<ExpectedConfig> {
 	}
 
 	load = async () => {
-		if (this.loadedConfig) return;
+		if (this.loadedConfig) return this.loadedConfig;
 
 		let rawConfig = undefined;
 		if (process.env.NODE_ENV === "local") {
