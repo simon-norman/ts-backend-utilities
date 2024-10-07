@@ -3,7 +3,12 @@ import {
 	ListSecretsCommand,
 	SecretsManagerClient,
 } from "@aws-sdk/client-secrets-manager";
-import { type Static, Type as T, type TObject } from "@sinclair/typebox";
+import {
+	type Static,
+	Type as T,
+	type TObject,
+	type TProperties,
+} from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 
 export enum DeploymentType {
@@ -14,28 +19,31 @@ export enum DeploymentType {
 const AWS_SECRETS_EXTENSION_HTTP_PORT = 2773;
 const AWS_SECRETS_EXTENSION_SERVER_ENDPOINT = `http://localhost:${AWS_SECRETS_EXTENSION_HTTP_PORT}/secretsmanager/get?secretId=`;
 
-export class Config<ExpectedConfig> {
+export class Config<ExpectedConfig extends TProperties> {
 	loadedConfig?: ExpectedConfig = undefined;
 	awsSecretClient: SecretsManagerClient;
 
 	constructor(
 		private readonly deploymentType: DeploymentType,
 		private readonly serviceName: string,
-		private readonly expectedConfig: TObject,
+		private readonly expectedConfig: TObject<ExpectedConfig>,
 		private readonly unsecretKeys: string[],
 		region: string,
 	) {
+		console.log("INIT CONFIG", region);
 		this.awsSecretClient = new SecretsManagerClient({ region });
 	}
 
 	load = async () => {
+		console.log("LOADING CONFIG LOAD", this.loadedConfig);
 		if (this.loadedConfig) return this.loadedConfig;
 
 		let rawConfig = undefined;
 		if (process.env.NODE_ENV === "local") {
 			rawConfig = this.loadConfigLocally();
 		} else {
-			rawConfig = await this.loadConfigFromAwsSecrets();
+			console.log("LOADING AWS SECRETS");
+			rawConfig = await this.loadSecretConfig();
 		}
 
 		rawConfig = {
@@ -79,7 +87,9 @@ export class Config<ExpectedConfig> {
 
 	loadConfigFromAwsSecrets = async (): Promise<Record<string, string>> => {
 		const command = new GetSecretValueCommand({ SecretId: this.secretName });
+		console.log("secret command", this.secretName);
 		const response = await this.awsSecretClient.send(command);
+		console.log("secret response", response);
 
 		if (!response.SecretString)
 			throw new Error("AWS secret not available as string");
@@ -90,6 +100,7 @@ export class Config<ExpectedConfig> {
 	loadConfigFromLambda = async () => {
 		const url = `${AWS_SECRETS_EXTENSION_SERVER_ENDPOINT}${this.secretName}`;
 		const sessionToken = process.env.AWS_SESSION_TOKEN;
+		console.log("SESSION TOKEN", sessionToken, url);
 		if (!sessionToken)
 			throw new Error("No session token found to retrieve secrets");
 
@@ -99,6 +110,7 @@ export class Config<ExpectedConfig> {
 				"X-Aws-Parameters-Secrets-Token": sessionToken,
 			},
 		});
+		console.log("response of get token", response);
 
 		if (!response.ok) {
 			throw new Error(
@@ -107,6 +119,7 @@ export class Config<ExpectedConfig> {
 		}
 
 		const secretContent = (await response.json()) as { SecretString: string };
+		console.log("secret content", secretContent);
 
 		return JSON.parse(secretContent.SecretString);
 	};
