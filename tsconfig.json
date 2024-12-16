@@ -1,14 +1,22 @@
 {
 	"compilerOptions": {
 		"outDir": "dist",
-		"module": "NodeNext",
-		"target": "ESNext",
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
 		"skipLibCheck": true,
 		"baseUrl": "./",
 		"paths": {
 			"src/*": ["./src/*"]
-		}
+		},
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"lib": [
+			// Include modern JavaScript libraries
+			"ES2022",
+			"DOM",
+			"DOM.Iterable"
+		],
+		"esModuleInterop": true
 	}
 }

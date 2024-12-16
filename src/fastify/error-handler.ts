@@ -8,7 +8,7 @@ export const addErrorHandler = (server: FastifyInstance) => {
 		let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
 		let data = undefined;
 		if (error instanceof BackendError) {
-			publicMessage = error.params.publicErrMessage;
+			publicMessage = error.params.publicMessage;
 			statusCode = error.params.httpStatusCode || statusCode;
 			data = error.params.publicMetadata;
 		}

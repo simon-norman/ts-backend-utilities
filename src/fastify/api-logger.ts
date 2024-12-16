@@ -1,7 +1,9 @@
 import type { FastifyLoggerOptions } from "fastify";
 import type { PinoLoggerOptions } from "fastify/types/logger";
 
-const commonLoggingOptions: FastifyLoggerOptions & PinoLoggerOptions = {
+type LoggingOptions = FastifyLoggerOptions & PinoLoggerOptions;
+
+const commonLoggingOptions: LoggingOptions = {
 	level: "info",
 	serializers: {
 		req(request) {
@@ -28,7 +30,11 @@ export enum LoggingEnvironment {
 	production = "production",
 }
 
-export const getLoggerOptions = (environment: LoggingEnvironment) => {
+export const getLoggerOptions = (): LoggingOptions | boolean => {
+	const environment =
+		(process.env.API_LOGGER_ENVIRONMENT as LoggingEnvironment) ||
+		LoggingEnvironment.development;
+
 	if (environment === LoggingEnvironment.development) {
 		return {
 			transport: {
@@ -43,7 +49,9 @@ export const getLoggerOptions = (environment: LoggingEnvironment) => {
 	}
 
 	if (environment === LoggingEnvironment.tests) {
-		return false;
+		return {
+			level: "info",
+		};
 	}
 
 	if (environment === LoggingEnvironment.production) {
@@ -61,4 +69,6 @@ export const getLoggerOptions = (environment: LoggingEnvironment) => {
 			],
 		};
 	}
+
+	return false;
 };

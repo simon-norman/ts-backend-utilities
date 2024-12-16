@@ -1,6 +1,13 @@
-import type { Static, TObject, TSchema } from "@sinclair/typebox";
-import t from "@sinclair/typebox";
-import type { FastifyInstance, RouteOptions } from "fastify";
+import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import type { Static, TSchema } from "@sinclair/typebox";
+import type {
+	FastifyBaseLogger,
+	FastifyInstance,
+	RawReplyDefaultExpression,
+	RawRequestDefaultExpression,
+	RawServerDefault,
+	RouteOptions,
+} from "fastify";
 
 export type SchemaTypes<
 	T extends {
@@ -23,3 +30,11 @@ export type SchemaTypes<
 			}
 		: never;
 };
+
+export type FastifyTypebox = FastifyInstance<
+	RawServerDefault,
+	RawRequestDefaultExpression<RawServerDefault>,
+	RawReplyDefaultExpression<RawServerDefault>,
+	FastifyBaseLogger,
+	TypeBoxTypeProvider
+>;

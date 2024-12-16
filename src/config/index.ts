@@ -1,14 +1,8 @@
 import {
 	GetSecretValueCommand,
-	ListSecretsCommand,
 	SecretsManagerClient,
 } from "@aws-sdk/client-secrets-manager";
-import {
-	type Static,
-	Type as T,
-	type TObject,
-	type TProperties,
-} from "@sinclair/typebox";
+import type { Static, TObject, TProperties } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 
 export enum DeploymentType {
@@ -16,21 +10,23 @@ export enum DeploymentType {
 	lambda = "lambda",
 }
 
+export type ConfigOpts<ExpectedConfig extends TProperties> = {
+	deploymentType: DeploymentType;
+	serviceName: string;
+	expectedConfig: TObject<ExpectedConfig>;
+	unsecretKeys: string[];
+	region: string;
+};
+
 const AWS_SECRETS_EXTENSION_HTTP_PORT = 2773;
 const AWS_SECRETS_EXTENSION_SERVER_ENDPOINT = `http://localhost:${AWS_SECRETS_EXTENSION_HTTP_PORT}/secretsmanager/get?secretId=`;
 
 export class Config<ExpectedConfig extends TProperties> {
-	loadedConfig?: ExpectedConfig = undefined;
+	loadedConfig?: Static<TObject<ExpectedConfig>> = undefined;
 	awsSecretClient: SecretsManagerClient;
 
-	constructor(
-		private readonly deploymentType: DeploymentType,
-		private readonly serviceName: string,
-		private readonly expectedConfig: TObject<ExpectedConfig>,
-		private readonly unsecretKeys: string[],
-		region: string,
-	) {
-		this.awsSecretClient = new SecretsManagerClient({ region });
+	constructor(private readonly opts: ConfigOpts<ExpectedConfig>) {
+		this.awsSecretClient = new SecretsManagerClient({ region: opts.region });
 	}
 
 	load = async () => {
@@ -48,17 +44,17 @@ export class Config<ExpectedConfig extends TProperties> {
 			...this.loadUnsecretConfig(),
 		};
 
-		this.loadedConfig = Value.Decode(this.expectedConfig, rawConfig);
+		this.loadedConfig = Value.Decode(this.opts.expectedConfig, rawConfig);
 
 		return this.loadedConfig;
 	};
 
 	get secretName() {
-		return `${this.serviceName}-${process.env.NODE_ENV}/doppler`;
+		return `${this.opts.serviceName}-${process.env.NODE_ENV}/doppler`;
 	}
 
 	loadSecretConfig = async () => {
-		if (this.deploymentType === DeploymentType.fargate) {
+		if (this.opts.deploymentType === DeploymentType.fargate) {
 			return this.loadConfigFromAwsSecrets();
 		}
 
@@ -67,14 +63,14 @@ export class Config<ExpectedConfig extends TProperties> {
 
 	loadUnsecretConfig = () => {
 		const result: Record<string, string | undefined> = {};
-		this.unsecretKeys.forEach((key) => {
+		this.opts.unsecretKeys.forEach((key) => {
 			result[key] = process.env[key];
 		});
 		return result;
 	};
 
 	loadConfigLocally = () => {
-		const properties = Object.keys(this.expectedConfig.properties);
+		const properties = Object.keys(this.opts.expectedConfig.properties);
 		const result: Record<string, string | undefined> = {};
 		properties.forEach((key) => {
 			result[key] = process.env[key];
