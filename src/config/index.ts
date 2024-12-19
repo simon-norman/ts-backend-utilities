@@ -32,18 +32,15 @@ export class Config<ExpectedConfig extends TProperties> {
 		if (this.loadedConfig) return this.loadedConfig;
 
 		const localConfig = this.loadConfigLocally();
-		console.log("localConfig", localConfig);
 		const secretConfig =
 			process.env.NODE_ENV !== "local" ? await this.loadSecretConfig() : {};
 
-		console.log("secretConfig", secretConfig);
 		const rawConfig = {
 			...Object.fromEntries(
 				Object.entries(secretConfig).filter(([_, v]) => v !== undefined),
 			),
 			...localConfig,
 		};
-		console.log("rawConfig", rawConfig);
 
 		this.loadedConfig = Value.Decode(this.opts.expectedConfig, rawConfig);
 
