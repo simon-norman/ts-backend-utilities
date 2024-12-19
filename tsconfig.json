@@ -9,14 +9,9 @@
 			"src/*": ["./src/*"]
 		},
 		"target": "ES2022",
-		"module": "ESNext",
+		"module": "CommonJS",
 		"moduleResolution": "node",
-		"lib": [
-			// Include modern JavaScript libraries
-			"ES2022",
-			"DOM",
-			"DOM.Iterable"
-		],
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true
 	}
 }

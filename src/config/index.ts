@@ -14,7 +14,6 @@ export type ConfigOpts<ExpectedConfig extends TProperties> = {
 	deploymentType: DeploymentType;
 	serviceName: string;
 	expectedConfig: TObject<ExpectedConfig>;
-	unsecretKeys: string[];
 	region: string;
 };
 
@@ -32,16 +31,14 @@ export class Config<ExpectedConfig extends TProperties> {
 	load = async () => {
 		if (this.loadedConfig) return this.loadedConfig;
 
-		let rawConfig = undefined;
-		if (process.env.NODE_ENV === "local") {
-			rawConfig = this.loadConfigLocally();
-		} else {
-			rawConfig = await this.loadSecretConfig();
-		}
-
-		rawConfig = {
-			...rawConfig,
-			...this.loadUnsecretConfig(),
+		const localConfig = this.loadConfigLocally();
+		const secretConfig =
+			process.env.NODE_ENV !== "local" ? await this.loadSecretConfig() : {};
+		const rawConfig = {
+			...Object.fromEntries(
+				Object.entries(secretConfig).filter(([_, v]) => v !== undefined),
+			),
+			...localConfig,
 		};
 
 		this.loadedConfig = Value.Decode(this.opts.expectedConfig, rawConfig);
@@ -59,14 +56,6 @@ export class Config<ExpectedConfig extends TProperties> {
 		}
 
 		return this.loadConfigFromLambda();
-	};
-
-	loadUnsecretConfig = () => {
-		const result: Record<string, string | undefined> = {};
-		this.opts.unsecretKeys.forEach((key) => {
-			result[key] = process.env[key];
-		});
-		return result;
 	};
 
 	loadConfigLocally = () => {
