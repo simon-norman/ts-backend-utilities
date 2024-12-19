@@ -66,6 +66,7 @@ export class Config<ExpectedConfig extends TProperties> {
 		const properties = Object.keys(this.opts.expectedConfig.properties);
 		const result: Record<string, string | undefined> = {};
 		properties.forEach((key) => {
+			if (!process.env[key]) return;
 			result[key] = process.env[key];
 		});
 		return result;
