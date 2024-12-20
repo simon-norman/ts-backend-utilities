@@ -19,32 +19,29 @@ export async function setupAuth(app: FastifyInstance, config: AuthConfig) {
 	await app.register(jwt, {
 		secret: { public: config.publicKey },
 	});
+}
 
-	// Role-based verification
-	const authenticate =
-		(requiredRoles: string[]) => async (request: FastifyRequest) => {
-			try {
-				const decoded = await request.jwtVerify<DecodedToken>();
-				const userPermissions = decoded.roles;
+export const authenticate =
+	(requiredRoles: string[]) => async (request: FastifyRequest) => {
+		try {
+			const decoded = await request.jwtVerify<DecodedToken>();
+			const userPermissions = decoded.roles;
 
-				if (!requiredRoles.every((role) => userPermissions.includes(role))) {
-					BackendError.throw("Insufficient permissions", {
-						code: AuthErrorCodes.INSUFFICIENT_PERMISSIONS,
-						publicMessage: "Insufficient permissions",
-						httpStatusCode: StatusCodes.FORBIDDEN,
-					});
-				}
-			} catch (err: unknown) {
-				BackendError.reThrow({
+			if (!requiredRoles.every((role) => userPermissions.includes(role))) {
+				BackendError.throw("Insufficient permissions", {
 					code: AuthErrorCodes.INSUFFICIENT_PERMISSIONS,
-					publicMessage: "Insufficient permissions",
+					publicMessage:
+						"Sorry, you do not have permission to complete this action",
 					httpStatusCode: StatusCodes.FORBIDDEN,
-					originalError: err,
 				});
 			}
-		};
-
-	return {
-		authenticate,
+		} catch (err: unknown) {
+			BackendError.reThrow({
+				code: AuthErrorCodes.INSUFFICIENT_PERMISSIONS,
+				publicMessage:
+					"Sorry, you do not have permission to complete this action",
+				httpStatusCode: StatusCodes.FORBIDDEN,
+				originalError: err,
+			});
+		}
 	};
-}
