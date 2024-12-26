@@ -25,17 +25,17 @@ const commonLoggingOptions: LoggingOptions = {
 };
 
 export enum LoggingEnvironment {
-	development = "development",
+	local = "local",
 	tests = "tests",
-	production = "production",
+	deployed = "deployed",
 }
 
 export const getLoggerOptions = (): LoggingOptions | boolean => {
 	const environment =
 		(process.env.API_LOGGER_ENVIRONMENT as LoggingEnvironment) ||
-		LoggingEnvironment.development;
+		LoggingEnvironment.deployed;
 
-	if (environment === LoggingEnvironment.development) {
+	if (environment === LoggingEnvironment.local) {
 		return {
 			transport: {
 				target: "pino-pretty",
@@ -49,12 +49,10 @@ export const getLoggerOptions = (): LoggingOptions | boolean => {
 	}
 
 	if (environment === LoggingEnvironment.tests) {
-		return {
-			level: "info",
-		};
+		return false;
 	}
 
-	if (environment === LoggingEnvironment.production) {
+	if (environment === LoggingEnvironment.deployed) {
 		return {
 			...commonLoggingOptions,
 			redact: [

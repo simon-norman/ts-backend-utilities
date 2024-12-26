@@ -44,6 +44,11 @@ type StartOptions = {
 	cors: CorsOptions;
 	/** default is to enable */
 	helmet?: FastifyHelmetOptions | false;
+	/** default is true. would be set to false for example to use in a lambda
+	 * where requests are injected into the instance from the lambda event
+	 * rather than going through the network
+	 */
+	runAsServer?: boolean;
 };
 
 /**
@@ -112,7 +117,11 @@ export class FastifyApi<ExpectedConfig extends TProperties> {
 
 			await this.api.register(startOpts.routes);
 
-			await this.api.listen({ port: this.opts.portNumber });
+			if (startOpts.runAsServer !== false) {
+				await this.api.listen({ port: this.opts.portNumber });
+			} else {
+				return this.api;
+			}
 		} catch (err) {
 			this.api.log.error(err, `Failed to start server - ${this.opts.appName}`);
 			process.exit(1);

@@ -19,11 +19,14 @@ export class BackendError<T> extends Error {
 		super(message);
 	}
 
-	public static throw<Y>(message: string, params: BackendErrorParams<Y>) {
+	public static throw<Y>(
+		message: string,
+		params: BackendErrorParams<Y>,
+	): never {
 		throw new BackendError(message, params);
 	}
 
-	public static reThrow<Y>(params: BackendErrorParams<Y>) {
+	public static reThrow<Y>(params: BackendErrorParams<Y>): never {
 		const message =
 			params.originalError instanceof Error
 				? params.originalError.message
