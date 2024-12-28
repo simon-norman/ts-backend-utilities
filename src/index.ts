@@ -1,4 +1,3 @@
-// export * from "src/" <- path here
 export * from "./config";
 export * from "./fastify/api-logger";
 export * from "./fastify/auth";
@@ -12,3 +11,6 @@ export * from "./errors/backend-error";
 export * from "./validation/default-validation";
 export * from "./validation/string-validation";
 export * from "./validation/numeric-validation";
+
+export * from "./lambda/message";
+export * from "./lambda/sqs-lambda-handler";
