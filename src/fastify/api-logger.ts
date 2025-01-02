@@ -30,12 +30,9 @@ export enum LoggingEnvironment {
 	deployed = "deployed",
 }
 
-export const getLoggerOptions = (): LoggingOptions | boolean => {
-	const environment =
-		(process.env.API_LOGGER_ENVIRONMENT as LoggingEnvironment) ||
-		LoggingEnvironment.deployed;
-
-	if (environment === LoggingEnvironment.local) {
+const getLocalTransportConfig = () => {
+	try {
+		require("pino-pretty");
 		return {
 			transport: {
 				target: "pino-pretty",
@@ -44,6 +41,21 @@ export const getLoggerOptions = (): LoggingOptions | boolean => {
 					ignore: "pid,hostname",
 				},
 			},
+		};
+	} catch {
+		// Return undefined to use default Pino behavior
+		return {};
+	}
+};
+
+export const getLoggerOptions = (): LoggingOptions | boolean => {
+	const environment =
+		(process.env.API_LOGGER_ENVIRONMENT as LoggingEnvironment) ||
+		LoggingEnvironment.deployed;
+
+	if (environment === LoggingEnvironment.local) {
+		return {
+			...getLocalTransportConfig(),
 			...commonLoggingOptions,
 		};
 	}
