@@ -17,8 +17,8 @@ export class BaseClient {
 		});
 	}
 
-	async request(config: AxiosRequestConfig) {
-		const response = await this.client.request({
+	async request<T>(config: AxiosRequestConfig): Promise<T> {
+		const response = await this.client.request<T>({
 			...config,
 			headers: {
 				...config.headers,
