@@ -7,6 +7,12 @@ export * from "./fastify/health-check";
 export * from "./fastify/error-handler";
 export * from "./fastify/route";
 export * from "./errors/backend-error";
+export * from "./errors/error-codes";
+
+export * from "./api-client/api-client";
+export * from "./api-client/auth-client";
+export * from "./api-client/base-client";
+export * from "./api-client/access-token";
 
 export * from "./validation/default-validation";
 export * from "./validation/string-validation";
