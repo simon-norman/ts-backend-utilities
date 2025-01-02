@@ -1,6 +1,6 @@
 {
   "name": "@breeze32/ts-backend-utilities",
-  "version": "1.9.8",
+  "version": "1.10.0",
   "author": "Simon Norman",
   "main": "dist/index.js",
   "devDependencies": {
