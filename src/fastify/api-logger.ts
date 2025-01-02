@@ -32,7 +32,8 @@ export enum LoggingEnvironment {
 
 const getLocalTransportConfig = () => {
 	try {
-		require("pino-pretty");
+		const pinoPretty = require("pino-pretty");
+		if (!pinoPretty) return {};
 		return {
 			transport: {
 				target: "pino-pretty",
