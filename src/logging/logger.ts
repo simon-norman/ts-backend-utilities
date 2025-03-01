@@ -10,7 +10,7 @@ type Log = Record<string, unknown> & {
 
 export class Logger {
 	constructor(
-		private readonly logger: PinoLogger | FastifyBaseLogger,
+		private logger: PinoLogger | FastifyBaseLogger,
 		service: string,
 		meta?: Bindings,
 	) {
@@ -19,5 +19,9 @@ export class Logger {
 
 	public log(data: Log): void {
 		this.logger[data.level](data);
+	}
+
+	public setContext(meta: Bindings) {
+		this.logger = this.logger.child(meta);
 	}
 }
