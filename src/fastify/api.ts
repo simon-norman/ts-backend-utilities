@@ -7,7 +7,8 @@ import fastify, {
 	type RawServerDefault,
 } from "fastify";
 import { Config, type ConfigOpts } from "src/config";
-import { getLoggerOptions } from "./api-logger";
+import { Logger } from "src/logging/logger";
+import { getLoggerOptions, setupCustomFastifyLogger } from "./api-logger";
 import { type AuthConfig, setupAuth } from "./auth";
 import { type CorsOptions, addCors } from "./cors";
 import { addErrorHandler } from "./error-handler";
@@ -29,6 +30,7 @@ type FastifyOptions<ExpectedConfig extends TProperties> = {
 	 * Access the config with fastifyApi.config.loadedConfig
 	 */
 	config?: ConfigOpts<ExpectedConfig>;
+	globalLogContext?: Record<string, unknown>;
 };
 
 type StartOptions = {
@@ -89,12 +91,18 @@ type StartOptions = {
  */
 export class FastifyApi<ExpectedConfig extends TProperties> {
 	public readonly api: FastifyInstance;
+	public readonly customLog: Logger;
 	public config?: Config<ExpectedConfig>;
 	constructor(public readonly opts: FastifyOptions<ExpectedConfig>) {
 		const loggingOptions =
 			opts.includeLogger === false ? false : getLoggerOptions();
 
 		this.api = fastify({ logger: loggingOptions, ...opts.original });
+		this.customLog = new Logger(
+			this.api.log,
+			opts.appName,
+			opts.globalLogContext,
+		);
 
 		if (opts.config) {
 			this.config = new Config(opts.config);
@@ -103,6 +111,12 @@ export class FastifyApi<ExpectedConfig extends TProperties> {
 
 	async start(startOpts: StartOptions) {
 		try {
+			setupCustomFastifyLogger(
+				this.api,
+				this.opts.appName,
+				this.opts.globalLogContext,
+			);
+
 			await this.setupErrorHandler(startOpts);
 
 			await this.setupHealthCheck(startOpts);
@@ -123,7 +137,12 @@ export class FastifyApi<ExpectedConfig extends TProperties> {
 				return this.api;
 			}
 		} catch (err) {
-			this.api.log.error(err, `Failed to start server - ${this.opts.appName}`);
+			this.customLog.log({
+				msg: `Failed to start server - ${this.opts.appName}`,
+				level: "error",
+				code: "FAILED_TO_START_SERVER",
+				error: err,
+			});
 			process.exit(1);
 		}
 	}
@@ -164,9 +183,11 @@ export class FastifyApi<ExpectedConfig extends TProperties> {
 		if (start.authConfig) {
 			await setupAuth(this.api, start.authConfig);
 		} else {
-			this.api.log.warn(
-				"**No auth setup for this server, all routes will be public / exposed**",
-			);
+			this.customLog.log({
+				msg: "**No auth setup for this server, all routes will be public / exposed**",
+				level: "warn",
+				code: "NO_AUTH_SETUP_FOR_SERVER",
+			});
 		}
 	}
 }

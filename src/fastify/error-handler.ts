@@ -13,7 +13,13 @@ export const addErrorHandler = (server: FastifyInstance) => {
 			data = error.params.publicMetadata;
 		}
 
-		request.log.error(error);
+		request.customLog.log({
+			level: "error",
+			error,
+			publicMessage,
+			msg: error.message,
+			code: error.code,
+		});
 
 		reply.status(statusCode).send({
 			statusCode,

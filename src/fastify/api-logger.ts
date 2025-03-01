@@ -1,7 +1,24 @@
-import type { FastifyLoggerOptions } from "fastify";
+import type { FastifyInstance, FastifyLoggerOptions } from "fastify";
 import type { PinoLoggerOptions } from "fastify/types/logger";
+import { Logger } from "src/logging/logger";
 
 type LoggingOptions = FastifyLoggerOptions & PinoLoggerOptions;
+
+declare module "fastify" {
+	interface FastifyRequest {
+		customLog: Logger;
+	}
+}
+
+export function setupCustomFastifyLogger(
+	app: FastifyInstance,
+	service: string,
+	globalContext?: Record<string, unknown>,
+) {
+	app.addHook("onRequest", async (request) => {
+		request.customLog = new Logger(request.log, service, globalContext);
+	});
+}
 
 const commonLoggingOptions: LoggingOptions = {
 	level: "info",
