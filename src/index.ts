@@ -8,6 +8,7 @@ export * from "./fastify/error-handler";
 export * from "./fastify/route";
 export * from "./errors/backend-error";
 export * from "./errors/error-codes";
+export * from "./logging/logger";
 
 export * from "./api-client/api-client";
 export * from "./api-client/auth-client";
