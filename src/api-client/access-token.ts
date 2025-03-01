@@ -4,6 +4,7 @@ import FusionAuthClient, {
 	type LoginResponse,
 } from "@fusionauth/typescript-client";
 import type ClientResponse from "@fusionauth/typescript-client/build/src/ClientResponse";
+import fastq from "fastq";
 import { BackendError } from "src/errors/backend-error";
 import { ErrorCodes } from "src/errors/error-codes";
 
@@ -14,6 +15,7 @@ type AuthToken = Omit<LoginResponse, "accessToken" | "refreshToken"> & {
 
 export class AccessToken {
 	public fusionAuth: FusionAuthClient;
+	public refreshTokenQueue: fastq.queueAsPromised;
 
 	constructor(
 		private data: AuthToken,
@@ -21,6 +23,7 @@ export class AccessToken {
 	) {
 		// @ts-expect-error
 		this.fusionAuth = new FusionAuthClient(null, host);
+		this.refreshTokenQueue = fastq.promise(this, this.execRefresh, 1);
 	}
 
 	checkTokenExpiredOrAboutTo() {
@@ -71,12 +74,18 @@ export class AccessToken {
 	}
 
 	async refresh() {
+		await this.refreshTokenQueue.push({});
+	}
+
+	execRefresh = async () => {
+		if (!this.checkTokenExpiredOrAboutTo()) return;
+
 		const response = await this.fusionAuth.exchangeRefreshTokenForJWT({
 			refreshToken: this.data.refreshToken,
 		});
 
 		this.data = AccessToken.loadFromResponse(response);
-	}
+	};
 
 	async latestToken() {
 		if (this.checkTokenExpiredOrAboutTo()) {

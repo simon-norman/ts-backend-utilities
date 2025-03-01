@@ -14,6 +14,7 @@ export * from "./api-client/api-client";
 export * from "./api-client/auth-client";
 export * from "./api-client/base-client";
 export * from "./api-client/access-token";
+export * from "./api-client/client-generator/client-generator";
 
 export * from "./validation/default-validation";
 export * from "./validation/string-validation";
