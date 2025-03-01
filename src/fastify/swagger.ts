@@ -1,8 +1,5 @@
 import swagger, { type FastifyDynamicSwaggerOptions } from "@fastify/swagger";
-import swaggerUI, {
-	FastifySwaggerUiConfigOptions,
-	type FastifySwaggerUiOptions,
-} from "@fastify/swagger-ui";
+import swaggerUI, { type FastifySwaggerUiOptions } from "@fastify/swagger-ui";
 import type { FastifyInstance } from "fastify";
 
 export type SwaggerOpts = {
@@ -16,7 +13,8 @@ export const setupFastifySwagger = async (
 	opts: SwaggerOpts,
 ) => {
 	await server.register(swagger, {
-		swagger: {
+		openapi: {
+			openapi: "3.0.0",
 			info: {
 				title: `${opts.name} API`,
 				description: "API documentation",
