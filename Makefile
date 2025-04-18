@@ -9,7 +9,7 @@ update-internal:
 publish:
 	git add .
 	git commit -m $(COMMIT_MESSAGE)
-	tsup
+	pnpm exec tsup
 	pnpm version $(VERSION)
 	pnpm publish --access public
 .PHONY: publish
