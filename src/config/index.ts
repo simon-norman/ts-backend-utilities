@@ -48,7 +48,9 @@ export class Config<ExpectedConfig extends TProperties> {
 	};
 
 	get secretName() {
-		return `${this.opts.serviceName}-${process.env.NODE_ENV}/doppler`;
+		return `${this.opts.serviceName}-${
+			process.env.NODE_ENV?.split("-")[0]
+		}/doppler`;
 	}
 
 	loadSecretConfig = async () => {
