@@ -102,7 +102,7 @@ export class Config<ExpectedConfig extends TProperties> {
 				{
 					code: "LAMBDA_FETCH_SECRET_ERROR",
 					publicMessage: "Error occured while requesting secret",
-					privateMetadata: await response.json(),
+					privateMetadata: { errorText: await response.text() },
 				},
 			);
 		}
