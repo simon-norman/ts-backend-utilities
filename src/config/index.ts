@@ -4,6 +4,7 @@ import {
 } from "@aws-sdk/client-secrets-manager";
 import type { Static, TObject, TProperties } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
+import { BackendError } from "src/errors/backend-error";
 
 export enum DeploymentType {
 	fargate = "fargate",
@@ -96,8 +97,13 @@ export class Config<ExpectedConfig extends TProperties> {
 		});
 
 		if (!response.ok) {
-			throw new Error(
+			return BackendError.throw(
 				`Error occured while requesting secret ${this.secretName}. Responses status was ${response.status}`,
+				{
+					code: "LAMBDA_FETCH_SECRET_ERROR",
+					publicMessage: "Error occured while requesting secret",
+					privateMetadata: await response.json(),
+				},
 			);
 		}
 
