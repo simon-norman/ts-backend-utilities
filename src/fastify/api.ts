@@ -105,7 +105,7 @@ export class FastifyApi<ExpectedConfig extends TProperties> {
 		);
 
 		if (opts.config) {
-			this.config = new Config(opts.config);
+			this.config = new Config({ ...opts.config, logger: this.customLog });
 		}
 	}
 
