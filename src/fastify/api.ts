@@ -111,28 +111,43 @@ export class FastifyApi<ExpectedConfig extends TProperties> {
 
 	async start(startOpts: StartOptions) {
 		try {
+			this.customLog.log({
+				msg: "Setting up custom fastify logger...",
+				level: "info",
+			});
 			setupCustomFastifyLogger(
 				this.api,
 				this.opts.appName,
 				this.opts.globalLogContext,
 			);
 
+			this.customLog.log({ msg: "Setting up error handler...", level: "info" });
 			await this.setupErrorHandler(startOpts);
 
+			this.customLog.log({ msg: "Setting up health check...", level: "info" });
 			await this.setupHealthCheck(startOpts);
 
+			this.customLog.log({ msg: "Loading swagger...", level: "info" });
 			await this.setupSwagger(startOpts);
 
+			this.customLog.log({ msg: "Loading cors...", level: "info" });
 			await addCors(this.api, startOpts.cors);
 
+			this.customLog.log({ msg: "Loading helmet...", level: "info" });
 			await addHelmet(this.api);
 
+			this.customLog.log({ msg: "Setting up auth...", level: "info" });
 			await this.setupAuth(startOpts);
 
+			this.customLog.log({ msg: "Setting up routes...", level: "info" });
 			await this.api.register(startOpts.routes);
 
 			if (startOpts.runAsServer !== false) {
 				await this.api.listen({ port: this.opts.portNumber });
+				this.customLog.log({
+					msg: `Server started on port ${this.opts.portNumber}`,
+					level: "info",
+				});
 			} else {
 				return this.api;
 			}
