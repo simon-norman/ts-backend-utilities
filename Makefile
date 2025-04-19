@@ -7,7 +7,7 @@ update-internal:
 .PHONY: update-internal-packages
 
 publish:
-	$(MAKE) push COMMIT=$(COMMIT)
+	-$(MAKE) push COMMIT=$(COMMIT)
 	pnpm version $(VERSION)
 	pnpm publish --access public
 .PHONY: publish
