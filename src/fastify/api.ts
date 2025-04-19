@@ -143,10 +143,13 @@ export class FastifyApi<ExpectedConfig extends TProperties> {
 			await this.api.register(startOpts.routes);
 
 			if (startOpts.runAsServer !== false) {
-				await this.api.listen({ port: this.opts.portNumber });
-				this.customLog.log({
-					msg: `Server started on port ${this.opts.portNumber}`,
-					level: "info",
+				await this.api.listen({ port: this.opts.portNumber }, (err, _) => {
+					if (!err) {
+						this.customLog.log({
+							msg: `Server started on port ${this.opts.portNumber}`,
+							level: "info",
+						});
+					}
 				});
 			} else {
 				return this.api;
