@@ -4,7 +4,7 @@ import { Bindings, Level, Logger as PinoLogger } from "pino";
 type Log = Record<string, unknown> & {
 	msg: string;
 	level: Level;
-	code: string;
+	code?: string;
 	error?: unknown;
 };
 
@@ -14,7 +14,11 @@ export class Logger {
 		service: string,
 		meta?: Bindings,
 	) {
-		this.logger = logger.child({ service, ...meta });
+		this.logger = logger.child({
+			level: process.env.LOG_LEVEL,
+			service,
+			...meta,
+		});
 	}
 
 	public log(data: Log): void {
