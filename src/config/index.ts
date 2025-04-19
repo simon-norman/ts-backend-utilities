@@ -120,31 +120,12 @@ export class Config<ExpectedConfig extends TProperties> {
 			);
 		}
 
-		const responseText = await response.text();
-		this.opts.logger.log({
-			level: "info",
-			msg: "Response text received",
-			metadata: {
-				textLength: responseText.length,
-				textPreview:
-					responseText.substring(0, 100) +
-					(responseText.length > 100 ? "..." : ""),
-			},
-		});
-
-		const secretContent = JSON.parse(responseText) as { SecretString: string };
+		const secretContent = (await response.json()) as { SecretString: string };
 
 		this.opts.logger.log({
 			level: "info",
-			msg: "Parsed JSON response",
-			metadata: { hasSecretString: !!secretContent.SecretString },
+			msg: "Loaded secret content",
 		});
-
-		// const secretContent = (await response.json()) as { SecretString: string };
-		// this.opts.logger.log({
-		// 	level: "info",
-		// 	msg: "Loaded secret content",
-		// });
 
 		return JSON.parse(secretContent.SecretString);
 	};
