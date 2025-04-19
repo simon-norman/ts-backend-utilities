@@ -129,4 +129,48 @@ export class Config<ExpectedConfig extends TProperties> {
 
 		return JSON.parse(secretContent.SecretString);
 	};
+
+	tryLoadConfig = async (
+		url: string,
+		sessionToken: string,
+		noOfAttempts = 1,
+	): Promise<Response> => {
+		const response = await fetch(url, {
+			method: "GET",
+			headers: {
+				"X-Aws-Parameters-Secrets-Token": sessionToken,
+			},
+		});
+
+		this.opts.logger.log({
+			level: "info",
+			msg: "Secrets response",
+			metadata: { success: response.ok },
+		});
+
+		if (!response.ok) {
+			const responseText = await response.text();
+			if (
+				responseText === "not ready to serve traffic, please wait" &&
+				noOfAttempts < 3
+			) {
+				this.opts.logger.log({
+					level: "info",
+					msg: `Secrets extension not ready, retrying - attempt number ${noOfAttempts}/3`,
+				});
+				return this.tryLoadConfig(url, sessionToken, noOfAttempts + 1);
+			}
+
+			return BackendError.throw(
+				`Error occured while requesting secret ${this.secretName}. Responses status was ${response.status}`,
+				{
+					code: "LAMBDA_FETCH_SECRET_ERROR",
+					publicMessage: "Error occured while requesting secret",
+					privateMetadata: { errorText: await response.text() },
+				},
+			);
+		}
+
+		return response;
+	};
 }
