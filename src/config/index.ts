@@ -97,28 +97,7 @@ export class Config<ExpectedConfig extends TProperties> {
 			throw new Error("No session token found to retrieve secrets");
 
 		this.opts.logger.log({ level: "info", msg: "Fetching secrets" });
-		const response = await fetch(url, {
-			method: "GET",
-			headers: {
-				"X-Aws-Parameters-Secrets-Token": sessionToken,
-			},
-		});
-
-		this.opts.logger.log({
-			level: "info",
-			msg: "Secrets response",
-			metadata: { success: response.ok },
-		});
-		if (!response.ok) {
-			return BackendError.throw(
-				`Error occured while requesting secret ${this.secretName}. Responses status was ${response.status}`,
-				{
-					code: "LAMBDA_FETCH_SECRET_ERROR",
-					publicMessage: "Error occured while requesting secret",
-					privateMetadata: { errorText: await response.text() },
-				},
-			);
-		}
+		const response = await this.tryLoadConfig(url, sessionToken);
 
 		const secretContent = (await response.json()) as { SecretString: string };
 
