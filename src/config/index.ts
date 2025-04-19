@@ -96,7 +96,6 @@ export class Config<ExpectedConfig extends TProperties> {
 		if (!sessionToken)
 			throw new Error("No session token found to retrieve secrets");
 
-		this.opts.logger.log({ level: "info", msg: "Fetching secrets" });
 		const response = await this.tryLoadConfig(url, sessionToken);
 
 		const secretContent = (await response.json()) as { SecretString: string };
@@ -114,6 +113,8 @@ export class Config<ExpectedConfig extends TProperties> {
 		sessionToken: string,
 		noOfAttempts = 1,
 	): Promise<Response> => {
+		this.opts.logger.log({ level: "info", msg: "Fetching secrets" });
+
 		const response = await fetch(url, {
 			method: "GET",
 			headers: {
