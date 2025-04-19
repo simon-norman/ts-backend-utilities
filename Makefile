@@ -16,4 +16,4 @@ push:
 	git add .
 	git commit -m $(COMMIT)
 	git push
-.PHONY: publish
+.PHONY: push
