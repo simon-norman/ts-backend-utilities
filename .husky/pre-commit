@@ -1,2 +1,1 @@
-echo "FOOOO0"
-pnpm exec npmPkgJsonLint .
+pnpm exec npmPkgJsonLint -c ./.npmpackagejsonlintrc.json ./**/package.json
