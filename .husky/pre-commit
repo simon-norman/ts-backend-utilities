@@ -1,2 +1,2 @@
-echo "FOOOO"
+echo "FOOOO0"
 pnpm exec npmPkgJsonLint .
