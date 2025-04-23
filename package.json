@@ -26,7 +26,13 @@
     "bump-patch": "pnpm version patch",
     "publish-patch": "pnpm bump-patch && pnpm publish --access public",
     "bump-minor": "pnpm version minor",
-    "publish-minor": "pnpm bump-minor && pnpm publish --access public"
+    "publish-minor": "pnpm bump-minor && pnpm publish --access public",
+    "prepare": "husky install"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx npm-package-json-lint"
+    }
   },
   "types": "dist/index.d.ts",
   "dependencies": {
@@ -37,7 +43,7 @@
     "@fastify/jwt": "9.0.2",
     "@fastify/swagger": "9.4.0",
     "@fastify/swagger-ui": "5.2.0",
-    "@fastify/type-provider-typebox": "^5.1.0",
+    "@fastify/type-provider-typebox": "5.1.0",
     "@fusionauth/typescript-client": "1.54.0",
     "@hey-api/client-axios": "^0.6.1",
     "@hey-api/openapi-ts": "^0.64.7",
