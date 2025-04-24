@@ -29,7 +29,7 @@ type FastifyOptions<ExpectedConfig extends TProperties> = {
 	 * before you tell the server to start
 	 * Access the config with fastifyApi.config.loadedConfig
 	 */
-	config?: ConfigOpts<ExpectedConfig>;
+	config?: Exclude<ConfigOpts<ExpectedConfig>, "logger">;
 	globalLogContext?: Record<string, unknown>;
 };
 
