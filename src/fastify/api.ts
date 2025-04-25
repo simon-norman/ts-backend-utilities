@@ -142,12 +142,14 @@ export class FastifyApi<ExpectedConfig extends TProperties> {
 			this.customLog.log({ msg: "Setting up routes...", level: "info" });
 			await this.api.register(startOpts.routes);
 
-			process.on("SIGTERM", async () => {
+			process.on("SIGUSR2", async () => {
 				this.customLog.log({
-					msg: "Terminating server...",
+					msg: "Terminating server before restart...",
 					level: "info",
 				});
 				await this.api.close();
+
+				process.kill(process.pid, "SIGUSR2");
 			});
 
 			if (startOpts.runAsServer !== false) {
