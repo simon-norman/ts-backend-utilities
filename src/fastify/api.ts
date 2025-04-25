@@ -149,6 +149,14 @@ export class FastifyApi<ExpectedConfig extends TProperties> {
 							msg: `Server started on port ${this.opts.portNumber}`,
 							level: "info",
 						});
+					} else {
+						this.customLog.log({
+							msg: `Failed to start server - ${this.opts.appName}`,
+							level: "error",
+							code: "FAILED_TO_START_SERVER",
+							error: err,
+						});
+						process.exit(1);
 					}
 				});
 			} else {
