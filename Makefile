@@ -16,7 +16,7 @@ publish-beta:
 	-$(MAKE) push COMMIT=$(COMMIT)
 	pnpm version prerelease --preid=beta
 	pnpm publish --access public
-.PHONY: publish
+.PHONY: publish-beta
 
 push:
 	git add .
