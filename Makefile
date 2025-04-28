@@ -7,12 +7,14 @@ update-internal:
 .PHONY: update-internal-packages
 
 publish:
+	-$(MAKE) check
 	-$(MAKE) push COMMIT=$(COMMIT)
 	pnpm version $(VERSION)
 	pnpm publish --access public
 .PHONY: publish
 
 publish-beta:
+	-$(MAKE) check
 	-$(MAKE) push COMMIT=$(COMMIT)
 	pnpm version prerelease --preid=beta
 	pnpm publish --access public --tag beta
@@ -21,6 +23,11 @@ publish-beta:
 install-beta:
 	pnpm install $(PACKAGE)@beta
 .PHONY: install-beta
+
+check:
+	pnpm exec biome check .
+	pnpm exec npmPkgJsonLint -c ./.npmpackagejsonlintrc.json ./**/package.json
+.PHONY: check
 
 push:
 	git add .
